@@ -6,16 +6,33 @@ import matplotlib.pyplot as plt
 
 # file path
 
-fp = Path(r'C:\Users\b1090197\Documents\Case Study Kit\Recordings\P6\MVNX\medium_round.mvnx')
+# fp = Path(r'C:\Users\b1090197\Documents\Case Study Kit\Recordings\P3\MVN\hard_round.mvnx')
+# fp2 = Path(r'C:\Users\b1090197\Documents\Case Study Kit\Recordings\P3\MVNX\hard_round.mvnx')
+# data = mvnx.load(fp)
+# data2 = mvnx.load(fp2)
+# com = pd.DataFrame(data.centerOfMass)
+# com.plot()
+# plt.show()
+#
+# com1 = np.diff(com, n=1, axis=0)
+# com1 = np.gradient(com, axis=0)
+# com2 = np.diff(com1, n=1, axis=0)
 
-data = mvnx.load(fp)
+fp = r'C:\Users\b1090197\Documents\Case Study Kit\Recordings\P12\MVNX\hard_round.xlsx'
 
-com = pd.DataFrame(data.centerOfMass)
-com.iloc[11295:11962,:].plot()
+com = pd.read_excel(fp, sheet_name='Center of Mass', index_col=0)
+gps = pd.read_excel(fp, sheet_name='Global Position', index_col=0)
+
+plt.plot(com.iloc[:,0])
 plt.show()
-
-com1 = np.diff(com, n=1, axis=0)
-com1 = np.gradient(com, axis=0)
-com2 = np.diff(com1, n=1, axis=0)
+plt.plot(com.iloc[:,1])
+plt.show()
+plt.plot(com.iloc[:,2])
+plt.show()
+plt.plot(gps.iloc[:,0], gps.iloc[:,1])
+plt.show()
+#plt.plot(np.linalg.norm(gps.iloc[:,:2], axis =1), gps.iloc[:,2])
+#plt.show()
+a=12
 
 
