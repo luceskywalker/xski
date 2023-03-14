@@ -10,15 +10,20 @@ working_dir = Path().absolute().parent.parent/'files'
 files = glob.glob(str(working_dir) + r'/subtech*.csv')
 data_dir = Path(r'C:\Users\b1090197\Documents\Case Study Kit\Recordings')
 
-subtechs = list(np.load('subtechs.npy', allow_pickle=False))
+# load list of all subtechniques
+# subtechs = list(np.load('subtechs.npy', allow_pickle=False))
 
-color_dict = {'dp': 'darkviolet',
-              'diagonal': 'green',
-              'glide': 'red',
-              'fall': 'red'}
-custom_lines = [Line2D([0], [0], color=color_dict['dp'], lw=4),
-                Line2D([0], [0], color=color_dict['diagonal'], lw=4),
-                Line2D([0], [0], color=color_dict['glide'], lw=4)]
+# create color dict for respective sub-tech
+color_dict = {'glide': 'red',
+              'dp': 'darkmagenta',
+              'dp-kick': 'blue',
+              'diagonal': 'aqua',
+              'heringbone': 'green',
+              'dp-skate': 'gold',
+              'v1-skate': 'sandybrown',
+              'skate': 'orangered',
+              'fall': 'black'}
+
 # loop over all participants
 
 for i, trial in enumerate(files):
@@ -29,29 +34,39 @@ for i, trial in enumerate(files):
 
     # read csv
     df = pd.read_csv(trial, sep=';')
-    if i == 0:
-        subtechs = list(df['sub-technique'])
-    else:
-        subtechs.extend(list(df['sub-technique']))
 
-np.save('subtechs', list(set(subtechs)), allow_pickle=False)
+    # if i == 0:
+    #     subtechs = list(df['sub-technique'])
+    # else:
+    #     subtechs.extend(list(df['sub-technique']))
 
-    # while i < len(files)-1:
-    #     continue
+# np.save('subtechs', list(set(subtechs)), allow_pickle=False)
+
+    if participant == 'P14' or participant == 'P8':
+        continue
+    gps = pd.read_excel(data_dir/participant/'MVNX'/(intensity + '_round.xlsx'), sheet_name='Global Position', index_col=0)
+    for k in range(len(df)-1):
+        # plot segment in color corresponding to subtechnique from color dict
+        plt.plot(gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],1], gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],0], color = color_dict[df['sub-technique'].iloc[k+1]], lw=4)
+
+    # custum legend
+    custom_lines = []
+    for subtec in df['sub-technique'].iloc[1:].unique():
+        custom_lines.append(Line2D([0], [0], color=color_dict[subtec], lw=4))
+        #
+        # [Line2D([0], [0], color=color_dict['dp'], lw=4),
+        #             Line2D([0], [0], color=color_dict['diagonal'], lw=4),
+        #             Line2D([0], [0], color=color_dict['glide'], lw=4)]
+    plt.legend(custom_lines, df['sub-technique'].iloc[1:].unique())
+    plt.title('Subtechnique Distribution - ' + participant + ' ' + intensity)
+    plt.show()
+
+
     #
-    # gps = pd.read_excel(data_dir/participant/'MVNX'/(intensity + '_round.xlsx'), sheet_name='Global Position', index_col=0)
-    # for k in range(len(df)-1):
-    #     plt.plot(gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],0], gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],1], color = color_dict[df['sub-technique'].iloc[k+1]])
-    # plt.legend(custom_lines, list(color_dict.keys())[:-1])
-    # plt.title('Subtechnique Distribution - ' + participant + ' ' + intensity)
-    # plt.show()
-
-
-
     # fig, ax = plt.subplots()
     # lines = ax.plot(data)
     # ax.legend(custom_lines, ['Cold', 'Medium', 'Hot'])
-
+    #
 
 
 
