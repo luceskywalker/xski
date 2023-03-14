@@ -25,7 +25,7 @@ color_dict = {'glide': 'red',
               'fall': 'black'}
 
 # loop over all participants
-
+d=[]
 for i, trial in enumerate(files):
     # get participant name and intensity
     participant = Path(trial).name.split('_')[1]
@@ -44,22 +44,59 @@ for i, trial in enumerate(files):
 
     if participant == 'P14' or participant == 'P8':
         continue
-    gps = pd.read_excel(data_dir/participant/'MVNX'/(intensity + '_round.xlsx'), sheet_name='Global Position', index_col=0)
-    for k in range(len(df)-1):
-        # plot segment in color corresponding to subtechnique from color dict
-        plt.plot(gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],1], gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],0], color = color_dict[df['sub-technique'].iloc[k+1]], lw=4)
+    gps = pd.read_csv(data_dir/participant/'MVNX'/(intensity + '_round_gps.csv'), index_col=0)
 
-    # custum legend
-    custom_lines = []
-    for subtec in df['sub-technique'].iloc[1:].unique():
-        custom_lines.append(Line2D([0], [0], color=color_dict[subtec], lw=4))
-        #
-        # [Line2D([0], [0], color=color_dict['dp'], lw=4),
-        #             Line2D([0], [0], color=color_dict['diagonal'], lw=4),
-        #             Line2D([0], [0], color=color_dict['glide'], lw=4)]
-    plt.legend(custom_lines, df['sub-technique'].iloc[1:].unique())
-    plt.title('Subtechnique Distribution - ' + participant + ' ' + intensity)
-    plt.show()
+    # mean distance
+    # get intersting window
+    gps = gps.iloc[df['last frame'][0]:df['last frame'].values[-1],:]
+
+    # define x and y
+    x = gps.values[:, 1]
+    y = gps.values[:,0]
+    # substract start frame (offset) and convert to m
+    x = (x - x[0]) * 111139
+    y = (y - y[0]) * 111139
+    # calculate distance between 2 consecutive points
+    dx = np.diff(x)
+    dy = np.diff(y)
+    # total distance
+    distance = np.cumsum(np.linalg.norm([dx, dy], axis=0))
+
+    # velocity
+    v = np.diff(distance)*240                           # correct for sampling rate
+    v = v[np.argwhere(v > 0)]                           # not continuous sampling
+    velocity = v / round((len(distance)/len(v)))        # in m/s
+    velocity *= 3.6                                     # convert to km/h
+
+    a=2
+
+
+    d.append(distance[-1])
+    if i == len(files)-2:
+        a=1
+
+
+
+
+
+
+
+
+    # for k in range(len(df)-1):
+    #     # plot segment in color corresponding to subtechnique from color dict
+    #     plt.plot(gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],1], gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],0], color = color_dict[df['sub-technique'].iloc[k+1]], lw=4)
+    #
+    # # custum legend
+    # custom_lines = []
+    # for subtec in df['sub-technique'].iloc[1:].unique():
+    #     custom_lines.append(Line2D([0], [0], color=color_dict[subtec], lw=4))
+    #     #
+    #     # [Line2D([0], [0], color=color_dict['dp'], lw=4),
+    #     #             Line2D([0], [0], color=color_dict['diagonal'], lw=4),
+    #     #             Line2D([0], [0], color=color_dict['glide'], lw=4)]
+    # plt.legend(custom_lines, df['sub-technique'].iloc[1:].unique())
+    # plt.title('Subtechnique Distribution - ' + participant + ' ' + intensity)
+    # plt.show()
 
     #
     # fig, ax = plt.subplots()

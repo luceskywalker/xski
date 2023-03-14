@@ -50,10 +50,9 @@ for participant in participants:
     int_df = pd.DataFrame(int_dict).T
     part_dict[participant] = int_df
 
+# create multiindex df with all data
 part_df = pd.concat(part_dict, axis=0)
 part_df.fillna(0, inplace=True)
-lap = pd.Series(techs_dict, name=participant + '_' + intensity)
+part_df.to_csv(working_dir/'subtech_all.csv', index_label=['Participant', 'Intensity'])
 
-
-a = 2
 

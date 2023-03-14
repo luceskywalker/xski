@@ -32,3 +32,8 @@ def downsample(input_data_df, original_sampling_rate_hz, target_sampling_rate_hz
     output_data_df = pd.DataFrame(data_array_downsampled, columns=input_data_df.columns)
 
     return output_data_df
+
+def resample_timeseries(ts, n_samples = 100):
+    ts_resampled = resample(ts, n_samples)
+    ts_smooth = gaussian_filter1d(ts_resampled, sigma = 4)
+    return ts_smooth
