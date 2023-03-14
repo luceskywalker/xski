@@ -84,6 +84,15 @@ for i in range(2, len(z)-2):
 znew = np.append(znew, np.mean(z[i-2:i+2]))  
 znew = np.append(znew, np.mean(z[i-2:i+1]))   
 z = znew
+
+############################################ sections ##################################################
+plt.figure()
+plt.plot(x, z)
+
+plt.figure()
+plt.plot(y, z)
+
+
 ###################### altern vel ########################################################
 plt.close("all")  
 points = np.array([x,y,z]).transpose().reshape(-1,1,3)
