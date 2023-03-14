@@ -1,6 +1,7 @@
 from IPython import get_ipython
 get_ipython().magic("reset -sf")
 
+from mpl_toolkits.mplot3d.art3d import Line3DCollection
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -65,23 +66,49 @@ x = df.iloc[:,-2].to_numpy()
 y = df.iloc[:,-1].to_numpy()
 z = ((df["Height"]- df["Height"][0])/1000).to_numpy()
 
+######################################### 3d  lat long ###########################
+x = (df["Longitude"]/10000000).to_numpy()
+y = (df["Latitude"]/10000000).to_numpy()
+z = ((df["Height"]- df["Height"][0])/1000).to_numpy()
+
+znew = np.array([])
+
+# moving avg for height
+
+znew = np.append(znew, np.mean(z[0:3]))
+znew = np.append(znew, np.mean(z[0:4]))
+
+for i in range(2, len(z)-2):
+    znew = np.append(znew, np.mean(z[i-2:i+3]))
+    
+znew = np.append(znew, np.mean(z[i-2:i+2]))  
+znew = np.append(znew, np.mean(z[i-2:i+1]))   
+z = znew
 ###################### altern vel ########################################################
-x = np.cumsum((df["VelocityN"]*0.25).to_numpy())
-y = np.cumsum((df["VelocityE"]*0.25).to_numpy())
-z = np.cumsum((df["VelocityD"]*0.25).to_numpy())
+plt.close("all")  
+points = np.array([x,y,z]).transpose().reshape(-1,1,3)
+segs = np.concatenate([points[:-1],points[1:]],axis=1)
+ 
+lc = Line3DCollection(segs, cmap=plt.get_cmap('jet'))
+lc.set_array(mu_mixed) # color the segments by our parameter
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+line = ax.add_collection3d(lc)
+cmap = fig.colorbar(line, ax=ax)
+cmap.set_label(label='snow friction',size=15, labelpad=0)
 
+ax.set_xlim(x.min(), x.max())
+ax.set_ylim(y.min(), y.max())
+ax.set_zlim(z.min(), z.max())
 
-
-plt.figure()
-ax = plt.axes(projection='3d')  
-ax.plot3D(x, y, z)
+plt.show()
+  
+fig.gca().set_xlabel("Longitude", fontsize = 17, labelpad=7)
+fig.gca().set_ylabel("Latitude", fontsize = 17, labelpad=7)
+fig.gca().set_zlabel("Elevation gain [m]", fontsize = 17)
+       
+  
+    
+  
     
     
-    
-    
-    
-    
-    
-    
-    
-
