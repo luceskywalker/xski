@@ -1,5 +1,6 @@
-from scipy.signal import butter, filtfilt
+from scipy.signal import butter, filtfilt, resample
 from scipy.interpolate import interp1d
+from scipy.ndimage import gaussian_filter1d
 import numpy as np
 import pandas as pd
 
@@ -37,3 +38,32 @@ def resample_timeseries(ts, n_samples = 100):
     ts_resampled = resample(ts, n_samples)
     ts_smooth = gaussian_filter1d(ts_resampled, sigma = 4)
     return ts_smooth
+
+def downsample(input_data_df, original_sampling_rate_hz, target_sampling_rate_hz):
+    """Downsample the data in the input_data_df from the original sampling rate to a given target sampling rate."""
+    data_array = input_data_df.values
+    len_data = data_array.shape[0]
+    current_x = np.linspace(0, len_data, len_data)
+    data_array_downsampled = interp1d(current_x, data_array, axis=0)(
+        np.linspace(0, len_data, int(len_data * target_sampling_rate_hz / original_sampling_rate_hz))
+    )
+
+    output_data_df = pd.DataFrame(data_array_downsampled, columns=input_data_df.columns)
+
+    return output_data_df
+
+def get_normalization_idx(array, output_length):
+    """
+
+    :param array: some array to be downsampled
+    :param output_length: requested output length
+    :return: list with idx for normalization
+    """
+    a = np.arange(len(array))
+    anorm=(a-min(a))/(max(a)-min(a))*(output_length-1)
+    idx_norm = [np.argmin(abs(x - anorm)) for x in np.arange(output_length)]
+
+    return idx_norm
+
+
+
