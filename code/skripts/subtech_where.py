@@ -21,7 +21,7 @@ color_dict = {'glide': 'red',
               'heringbone': 'green',
               'dp-skate': 'gold',
               'v1-skate': 'sandybrown',
-              'skate': 'orangered',
+              'skate': 'orange',
               'fall': 'black'}
 
 # loop over all participants
@@ -61,7 +61,6 @@ for i, trial in enumerate(files):
     plt.title('Subtechnique Distribution - ' + participant + ' ' + intensity)
     plt.show()
 
-
     #
     # fig, ax = plt.subplots()
     # lines = ax.plot(data)
@@ -70,7 +69,14 @@ for i, trial in enumerate(files):
 
 
 
-
+# distance
+# x = gps.values[:,1]
+# x=(x-x[0]) * 111139
+# dx = np.diff(x)
+# distance = np.cumsum(np.linalg.norm([dx,dy], axis=0))
+#
+#
+#
 
 
     # # substract offset
