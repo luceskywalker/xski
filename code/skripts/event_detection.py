@@ -8,14 +8,15 @@ import os
 import pickle
 from scipy import signal
 from scipy.signal import find_peaks
-    
+  
 
 os.chdir('C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/xski/files')
-
+plt.close("all")
 subjects= np.array([3, 5, 6, 7, 8, 12, 13, 14])
 intensities = ["easy", "medium", "hard"]
 fs = 240
-window = int(0.3*fs) # seconds in samples
+wind_part = (np.array([0.25, 0.15, 0.2, 0.2, 0.2, 0.2, 0.25, 0.2])*fs).astype(int)
+dist_part = (np.array([0.8, 0.7, 0.6, 0.6, 0.7, 0.6, 0.7, 0.7])*fs).astype(int)
 sub_techniques = ["dp", "dp-skate", "dp-kick", "diagonal", "heringbone"]
 
 ##################################### loading from excel ##################################
@@ -53,8 +54,19 @@ file = open("C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/file 
 erg_ja = pickle.load(file)
 file.close()
 
+partd = dict()
+intensd = dict()
+techd = dict()
+intervd = dict()
+
+
+
+counter = -1
 for participant in subjects:
+    counter += 1
+    
     for intensity in intensities:
+        #plt.figure()
 
         frame = pd.read_csv("subtech_P" + str(participant) + "_" + intensity + ".csv", sep =";")
         
@@ -65,11 +77,12 @@ for participant in subjects:
         b,a= signal.butter(4, 10/(fs/2), 'Lowpass') # filter at 10/0
         resultant_left = signal.filtfilt(b,a, res_left) # left pole
 
-        plt.figure()
-        plt.plot(resultant_left)
+      #  plt.figure()
+       # plt.plot(resultant_left)
         
         for technique in sub_techniques:
             tech_where = frame.index[frame['sub-technique'] == technique].tolist()
+            
             
             if tech_where:
                 
@@ -79,38 +92,65 @@ for participant in subjects:
                     
                     #left side
                     shoulder_left = erg_ja["P" + str(participant)][intensity]["T8_LeftUpperArm Flexion/Extension"]
-                    peaks, _ = find_peaks(shoulder_left[start:end], height = 40, distance = 0.5*fs) # at least 40° and 50 samples apart
+                    peaks, _ = find_peaks(shoulder_left[start:end], height = 0, distance = dist_part[counter]) # at least 40° and 50 samples apart
                     peaks_sh = list(peaks + start)
                     
                     acc_peaks_left = np.array([])
                     for peak in peaks_sh:
                         
-                        if peak-window >0:
-                            low_bound = peak-window 
+                        if peak-wind_part[counter] >0:
+                            low_bound = peak-wind_part[counter]
                         else:
                             low_bound = 0
                             
-                        if peak+window < len(shoulder_left)-1:
-                            up_bound = peak+window 
+                        if peak+wind_part[counter] < len(shoulder_left)-1:
+                            up_bound = peak+wind_part[counter]
                         else:
                             low_bound = len(shoulder_left)-1
                         
+                        ##finire questa parte
+                        a = resultant_left[low_bound: up_bound]
+                        peaks_window = find_peaks(resultant_left[low_bound: up_bound])
+                        peaks_where = list([peaks_window][0][0])
+                        max_ind = peaks_where[np.argmax(resultant_left[low_bound: up_bound][peaks_where])]
+                        acc_peaks_left = np.append(acc_peaks_left, max_ind + low_bound)
+                    
                         
-                        max_window = max(resultant_left[low_bound: up_bound])
-                        acc_peaks_left = np.append(acc_peaks_left, 
-                                              list(resultant_left[low_bound: up_bound]).index(max_window) + low_bound)
+                        
+                        #max_window = max(resultant_left[low_bound: up_bound])
+                        #acc_peaks_left = np.append(acc_peaks_left, 
+                                            #  list(resultant_left[low_bound: up_bound]).index(max_window) + low_bound)
                     
                     
                     acc_peaks_left = acc_peaks_left.astype(int)
-                    plt.plot(acc_peaks_left, resultant_left[acc_peaks_left], "v", color="red")
-                    del start, end
                     
-                    plt.figure()
-                    plt.plot(shoulder_left)
-                    plt.plot(resultant_left)
-
-
-plt.plot(shoulder_left)
-plt.plot(peaks_sh, shoulder_left[peaks_sh], "v", color="red")
-
-
+                    
+                    
+                    #plt.plot(np.arange(start,end), resultant_left[start: end], label = technique)
+                    #plt.plot(np.arange(start,end), shoulder_left[start: end], c = "black")
+                    #plt.plot(acc_peaks_left, resultant_left[acc_peaks_left], "v", color="red")
+                    del start, end
+                #plt.legend()
+                    
+                    if len(acc_peaks_left) != 0:            
+                       intervd[interval]= acc_peaks_left 
+                    acc_peaks_left = np.array([])
+                    
+                    
+            if intervd:            
+               techd[technique]= intervd.copy()
+            intervd.clear()
+            
+        if techd:            
+           intensd[intensity]= techd.copy()
+        techd.clear()
+    
+    if intensd:            
+       partd["P"+ str(participant)]= intensd.copy()
+    intensd.clear()
+                    
+                    
+import pickle
+f = open("ski_cycles.pkl","wb")
+pickle.dump(partd,f)
+f.close()

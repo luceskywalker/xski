@@ -1,6 +1,8 @@
 ﻿sub-technique;last frame
 start;1000
 diagonal;2424
+dp;13000
+none;16000
 dp;19510
 diagonal;21930
 dp;22670
@@ -12,4 +14,6 @@ glide;36811
 dp;39529
 heringbone;46250
 glide;51222
+dp;55000
+none;57000
 dp;59941
