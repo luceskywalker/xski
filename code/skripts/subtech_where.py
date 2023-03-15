@@ -72,7 +72,7 @@ for i, trial in enumerate(files):
     velocity *= 3.6                                     # convert to km/h
 
 
-    # calculate projection
+    # calculate projection of split points
     projections = pd.DataFrame(index = sec.index, columns=['Longitude', 'Latitude'])
     for split_point in sec.index:
         long_p = sec.loc[split_point]['Longitude']
