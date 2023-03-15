@@ -75,3 +75,21 @@ def find_projection_index(gps, long_p, lat_p):
     """
     return np.argmin(np.sqrt((long_p-gps['Longitude'].values)**2 + (lat_p-gps['Latitude'].values)**2))
 
+def low_pass_filter_series(sig, fs=100, f_cut=5, order=2):
+    """
+    ready for being used in a apply function
+    applies zero-lag butterworth filter to a signal
+    :param sig: signal to be filtered - series
+    :param fs: sampling frequency of sig - integer
+    :param f_cut: cut-off frequency (low-pass) - integer
+    :param order: order of filter - integer
+    :return sig_filt: filtered signal - np array
+    """
+    # design filter
+    sig_array = sig.values
+    nf = f_cut/(fs/2)
+    b, a = butter(order, nf, btype='low')
+
+    # apply filter
+    sig_filt = filtfilt(b, a, sig_array, axis=0, padtype='odd', padlen=3*(max(len(b), len(a))-1))
+    return pd.Series(sig_filt, name=sig.name)

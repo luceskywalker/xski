@@ -10,7 +10,7 @@ from xski_utilites.signal import find_projection_index
 working_dir = Path().absolute().parent.parent/'files'
 files = glob.glob(str(working_dir) + r'/subtech*.csv')
 data_dir = Path(r'C:\Users\b1090197\Documents\Case Study Kit\Recordings')
-section_path = r'C:\Users\b1090197\OneDrive\Documents\XSki\xski\files\sections1.csv'
+section_path = r'C:\Users\b1090197\OneDrive\Documents\XSki\xski\files\sections2.csv'
 sec = pd.read_csv(section_path, sep=';', decimal=',')
 
 # load list of all subtechniques
