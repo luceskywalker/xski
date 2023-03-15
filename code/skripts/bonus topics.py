@@ -1,5 +1,5 @@
 from IPython import get_ipython
-get_ipython().magic("reset -sf")
+#get_ipython().magic("reset -sf")
 
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 import matplotlib.pyplot as plt
@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import os 
 
-os.chdir('C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/xsens_case-study-kit_2023-03-07_1502/Case Study Kit/Recordings/GPS RTK data')
+os.chdir(r'C:\Users\b1090197\Documents\Case Study Kit\Recordings\GPS RTK data')
 plt.close('all')
 
 subject = 13

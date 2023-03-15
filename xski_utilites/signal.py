@@ -65,5 +65,13 @@ def get_normalization_idx(array, output_length):
 
     return idx_norm
 
-
+def find_projection_index(gps, long_p, lat_p):
+    """
+    finds the projection of a specific section point on the gps data of each participant
+    :param gps: data frame containing 'Longitude' and 'Latitude' time series
+    :param long_p: Longitude coordinate of requested point
+    :param lat_p: Latitude coordinate of requested point
+    :return: index where to find the projection
+    """
+    return np.argmin(np.sqrt((long_p-gps['Longitude'].values)**2 + (lat_p-gps['Latitude'].values)**2))
 

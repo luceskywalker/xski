@@ -4,11 +4,14 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import glob
 from pathlib import Path
+from xski_utilites.signal import find_projection_index
 
 # path
 working_dir = Path().absolute().parent.parent/'files'
 files = glob.glob(str(working_dir) + r'/subtech*.csv')
 data_dir = Path(r'C:\Users\b1090197\Documents\Case Study Kit\Recordings')
+section_path = r'C:\Users\b1090197\OneDrive\Documents\XSki\xski\files\sections1.csv'
+sec = pd.read_csv(section_path, sep=';', decimal=',')
 
 # load list of all subtechniques
 # subtechs = list(np.load('subtechs.npy', allow_pickle=False))
@@ -48,11 +51,11 @@ for i, trial in enumerate(files):
 
     # mean distance
     # get intersting window
-    gps = gps.iloc[df['last frame'][0]:df['last frame'].values[-1],:]
+    gps1 = gps.iloc[df['last frame'][0]:df['last frame'].values[-1],:]
 
     # define x and y
-    x = gps.values[:, 1]
-    y = gps.values[:,0]
+    x = gps1.values[:, 1]
+    y = gps1.values[:,0]
     # substract start frame (offset) and convert to m
     x = (x - x[0]) * 111139
     y = (y - y[0]) * 111139
@@ -68,35 +71,41 @@ for i, trial in enumerate(files):
     velocity = v / round((len(distance)/len(v)))        # in m/s
     velocity *= 3.6                                     # convert to km/h
 
-    a=2
 
-
-    d.append(distance[-1])
-    if i == len(files)-2:
-        a=1
-
-
-
+    # calculate projection
+    projections = pd.DataFrame(index = sec.index, columns=['Longitude', 'Latitude'])
+    for split_point in sec.index:
+        long_p = sec.loc[split_point]['Longitude']
+        lat_p = sec.loc[split_point]['Latitude']
+        projections.loc[split_point] = gps.loc[find_projection_index(gps, long_p, lat_p)].iloc[:2]
 
 
 
 
 
-    # for k in range(len(df)-1):
-    #     # plot segment in color corresponding to subtechnique from color dict
-    #     plt.plot(gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],1], gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],0], color = color_dict[df['sub-technique'].iloc[k+1]], lw=4)
-    #
-    # # custum legend
-    # custom_lines = []
-    # for subtec in df['sub-technique'].iloc[1:].unique():
-    #     custom_lines.append(Line2D([0], [0], color=color_dict[subtec], lw=4))
-    #     #
-    #     # [Line2D([0], [0], color=color_dict['dp'], lw=4),
-    #     #             Line2D([0], [0], color=color_dict['diagonal'], lw=4),
-    #     #             Line2D([0], [0], color=color_dict['glide'], lw=4)]
-    # plt.legend(custom_lines, df['sub-technique'].iloc[1:].unique())
-    # plt.title('Subtechnique Distribution - ' + participant + ' ' + intensity)
-    # plt.show()
+    for k in range(len(df)-1):
+        # plot segment in color corresponding to subtechnique from color dict
+        plt.plot(gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],1], gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],0], color = color_dict[df['sub-technique'].iloc[k+1]], lw=4)
+
+    # custum legend
+    custom_lines = []
+    for subtec in df['sub-technique'].iloc[1:].unique():
+        custom_lines.append(Line2D([0], [0], color=color_dict[subtec], lw=4))
+        #
+        # [Line2D([0], [0], color=color_dict['dp'], lw=4),
+        #             Line2D([0], [0], color=color_dict['diagonal'], lw=4),
+        #             Line2D([0], [0], color=color_dict['glide'], lw=4)]
+    plt.legend(custom_lines, df['sub-technique'].iloc[1:].unique())
+    plt.title('Subtechnique Distribution - ' + participant + ' ' + intensity)
+
+    # plot section points
+    # for point in sec.index:
+    #     marker = 'ko'
+    #     plt.plot(sec.loc[point]['Longitude'], sec.loc[point]['Latitude'], marker, markersize=8)
+    for split in projections.index:
+        marker = 'bo'
+        plt.plot(projections.loc[split]['Longitude'], projections.loc[split]['Latitude'], marker, markersize=8)
+    plt.show()
 
     #
     # fig, ax = plt.subplots()
