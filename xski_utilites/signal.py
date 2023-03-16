@@ -73,7 +73,7 @@ def find_projection_index(gps, long_p, lat_p):
     :param lat_p: Latitude coordinate of requested point
     :return: index where to find the projection
     """
-    return np.argmin(np.sqrt((long_p-gps['Longitude'].values)**2 + (lat_p-gps['Latitude'].values)**2))
+    return np.argmin(np.sqrt((long_p-gps['Longitude'].values)**2 + (lat_p-gps['Latitude'].values)**2))+gps.index[0]
 
 def low_pass_filter_series(sig, fs=100, f_cut=5, order=2):
     """

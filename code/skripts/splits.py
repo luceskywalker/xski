@@ -47,6 +47,9 @@ for i, trial in enumerate(files):
     if participant == 'P14' or participant == 'P8':
         continue
 
+    if participant == 'P5':
+        zz = 2
+
     # read csv subtech data
     df = pd.read_csv(trial, sep=';')
 
@@ -78,6 +81,6 @@ segtime_df = pd.concat(segtime_dict, axis=1)
 splits_df = pd.concat(splits_dict, axis=1)
 
 # save
-segtime_df.to_csv(working_dir/'segment_times.csv')
-splits_df.to_csv(working_dir/'split_times.csv')
+segtime_df.T.to_csv(working_dir/'segment_times_T.csv')
+splits_df.T.to_csv(working_dir/'split_times_T.csv')
 print('success')
