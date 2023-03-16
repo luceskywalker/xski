@@ -117,18 +117,15 @@ for participant in subjects:
                     
                         
                         
-                        #max_window = max(resultant_left[low_bound: up_bound])
-                        #acc_peaks_left = np.append(acc_peaks_left, 
-                                            #  list(resultant_left[low_bound: up_bound]).index(max_window) + low_bound)
-                    
+                        
                     
                     acc_peaks_left = acc_peaks_left.astype(int)
                     
                     
                     
-                    #plt.plot(np.arange(start,end), resultant_left[start: end], label = technique)
-                    #plt.plot(np.arange(start,end), shoulder_left[start: end], c = "black")
-                    #plt.plot(acc_peaks_left, resultant_left[acc_peaks_left], "v", color="red")
+                    plt.plot(np.arange(start,end), resultant_left[start: end], label = technique)
+                    plt.plot(np.arange(start,end), shoulder_left[start: end], c = "black")
+                    plt.plot(acc_peaks_left, resultant_left[acc_peaks_left], "v", color="red")
                     del start, end
                 #plt.legend()
                     

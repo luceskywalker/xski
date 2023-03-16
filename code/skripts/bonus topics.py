@@ -1,5 +1,5 @@
 from IPython import get_ipython
-#get_ipython().magic("reset -sf")
+get_ipython().magic("reset -sf")
 
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 import matplotlib.pyplot as plt
