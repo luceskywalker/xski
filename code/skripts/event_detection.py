@@ -10,7 +10,7 @@ from scipy import signal
 from scipy.signal import find_peaks
   
 
-os.chdir('C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/xski/files')
+os.chdir('C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/file esportati/CoM')
 plt.close("all")
 subjects= np.array([3, 5, 6, 7, 8, 12, 13, 14])
 intensities = ["easy", "medium", "hard"]
@@ -20,14 +20,14 @@ dist_part = (np.array([0.8, 0.7, 0.6, 0.6, 0.7, 0.6, 0.7, 0.7])*fs).astype(int)
 sub_techniques = ["dp", "dp-skate", "dp-kick", "diagonal", "heringbone"]
 
 ##################################### loading from excel ##################################
-"""
+
 intens = dict()
 part = dict()
 for subj in subjects:
     for intensity in intensities:
         
         name = "P" + str(subj) + "_" + intensity + "_round.xlsx"
-        df = pd.read_excel(name, sheet_name = "Ergonomic Joint Angles ZXY", usecols ="B:S")
+        df = pd.read_excel(name, sheet_name = "Center of Mass", usecols ="B:D")
         data_round = dict(zip(df.T.index, df.T.values))
       
         if data_round:
@@ -39,11 +39,10 @@ for subj in subjects:
     intens.clear()                    
 
       
-import pickle
-f = open("C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/xski/files/erg_joint_angles.pkl","wb")
+f = open("C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/file esportati/com_position.pkl","wb")
 pickle.dump(part,f)
 f.close()
-"""
+
 #######################################################################################################
 ###### load dictionary
 file = open("C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/file esportati/raw_acc_poles.pkl",'rb')
