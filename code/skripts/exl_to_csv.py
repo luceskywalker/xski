@@ -10,11 +10,11 @@ for x in data_dir.iterdir():
         dirs.append(x)
 
 for dir in dirs:
-    if (dir.name == 'P8') or (dir.name == 'P14'):#
-        continue
+    #if (dir.name == 'P8') or (dir.name == 'P14'):#
+    #    continue
     for file in glob.glob(str(dir/'MVNX'/'*.xlsx')):
-        gps = pd.read_excel(file, sheet_name='Global Position', index_col=0)
-        gps.to_csv(file[:-5] + '_gps.csv')
+        com = pd.read_excel(file, sheet_name='Center of Mass', index_col=0)
+        com.to_csv(file[:-5] + '_com.csv')
 
 
 

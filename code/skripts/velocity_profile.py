@@ -42,6 +42,7 @@ for i, trial in enumerate(files):
 
     # get gps data
     if participant == 'P14' or participant == 'P8':
+        # skip
         continue
     gps = pd.read_csv(data_dir/participant/'MVNX'/(intensity + '_round_gps.csv'), index_col=0)
 

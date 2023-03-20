@@ -55,7 +55,8 @@ def downsample(input_data_df, original_sampling_rate_hz, target_sampling_rate_hz
 
 def get_normalization_idx(array, output_length):
     """
-
+    gives the normalization idx for downsampling an array to a requested lenght
+    ! works only for DOWN sampling!
     :param array: some array to be downsampled
     :param output_length: requested output length
     :return: list with idx for normalization

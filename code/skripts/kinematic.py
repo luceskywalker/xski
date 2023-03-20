@@ -19,7 +19,8 @@ participants = ['P3', 'P5', 'P6', 'P7', 'P8', 'P12', 'P13', 'P14']
 intensities = ['easy', 'medium', 'hard']
 
 # cycle parameters
-cycle_params_df = pd.DataFrame(columns=['cycle_time', 'subtech', 'participant', 'intensity', 'start_frame', 'cycle_distance', 'cycle_speed'])
+cycle_params_df = pd.DataFrame(columns=['participant', 'intensity', 'subtech', 'start_frame', 'stop_frame',
+                                        'cycle_time', 'cycle_distance', 'cycle_speed'])
 
 # start loop for dp Pole Off
 all_score = {}
@@ -45,6 +46,8 @@ for participant in participants:
                 cycles['participant'] = np.repeat(participant, n_cyc)
                 cycles['intensity'] = np.repeat(intensity, n_cyc)
                 cycles['start_frame'] = cycle_dict[participant][intensity][subtech][order][:-1]
+                cycles['stop_frame'] = cycle_dict[participant][intensity][subtech][order][1:]
+
 
                 cycles['cycle_distance'] = np.repeat(0, n_cyc)
                 cycles['cycle_speed'] = np.repeat(0, n_cyc)
@@ -68,7 +71,7 @@ for participant in participants:
                         dist.append(distance)
                     cycles['cycle_distance'] = np.array(dist)
                     cycles['cycle_speed'] = cycles['cycle_distance']/cycles['cycle_time']*3.6
-            cycle_params_df = pd.concat([cycle_params_df, pd.DataFrame(cycles)], axis=0)
+                cycle_params_df = pd.concat([cycle_params_df, pd.DataFrame(cycles)], axis=0)
         # dp score
         dp_dict = cycle_dict[participant][intensity]['dp']
         score = []
@@ -194,10 +197,10 @@ cycle_params_df.to_csv(working_dir/'cycle_temp_params.csv')
 
 
 
-gps.sort_values()
-
-
-s1, s2 = cycle_dict['P6']['easy']['dp'][1][6:8]
+# gps.sort_values()
+#
+#
+# s1, s2 = cycle_dict['P6']['easy']['dp'][1][6:8]
 
 #get_pole_off(s1,s2, joint_angles['P6']['easy'])
 
