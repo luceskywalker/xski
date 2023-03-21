@@ -1,4 +1,4 @@
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -6,6 +6,8 @@ import os
 from scipy.signal import find_peaks
 from xski_utilites.signal import low_pass_filter_series, find_projection_index
 from xski_utilites.fill3d import fill_between_3d
+from xski_utilites.bonus import get_mu_mixed
+
 
 
 os.chdir(r'C:\Users\b1090197\Documents\Case Study Kit\Recordings\GPS RTK data')
@@ -21,7 +23,9 @@ coordinates['Height'] = ((df["Height"]/ 1000))
 # filter and smooth path
 c_filt = coordinates.apply(low_pass_filter_series, axis=0)
 
+mu_mixed = get_mu_mixed()
 runde = c_filt.loc[1235:1760]
+m_mixed = mu_mixed[1235:1760]
 # define x and y
 x = runde['Longitude'].values
 y = runde['Latitude'].values
@@ -105,6 +109,20 @@ set2=set2.T
 fig = plt.figure()
 fig.suptitle('Track Profile')
 ax = fig.add_subplot(111, projection='3d')
+
+# this is new
+# segs = np.concatenate([set1[:-1],set1[1:]],axis=1)
+# lc = Line3DCollection([*set1, *set1], cmap=plt.get_cmap('jet'))
+# line = ax.add_collection3d(lc)
+# plt.show()
+#
+# lc.set_array(mu_mixed) # color the segments by our parameter
+# ax = fig.add_subplot(111, projection='3d')
+# line = ax.add_collection3d(lc)
+# cmap = fig.colorbar(line, ax=ax)
+# cmap.set_label(label='snow friction',size=15, labelpad=0)
+
+
 ax.plot(*set1, lw=2, c='grey')
 ax.plot(*set2, lw=2, c='grey')
 
