@@ -79,7 +79,15 @@ for i, trial in enumerate(files):
         lat_p = sec.loc[split_point]['Latitude']
         projections.loc[split_point] = gps.loc[find_projection_index(gps, long_p, lat_p)].iloc[:2]
 
-
+    # get uphill technique
+    # tech_up=[]
+    # for split_point in [0,3]:
+    #     long_s = sec.loc[split_point]['Longitude']
+    #     lat_s = sec.loc[split_point]['Latitude']
+    #     start = find_projection_index(gps, long_s, long_s)
+    #     long_f = sec.loc[split_point+1]['Longitude']
+    #     lat_f = sec.loc[split_point+1]['Latitude']
+    #     finish = find_projection_index(gps, long_f, long_f)
 
 
 
@@ -95,6 +103,8 @@ for i, trial in enumerate(files):
         # [Line2D([0], [0], color=color_dict['dp'], lw=4),
         #             Line2D([0], [0], color=color_dict['diagonal'], lw=4),
         #             Line2D([0], [0], color=color_dict['glide'], lw=4)]
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
     plt.legend(custom_lines, df['sub-technique'].iloc[1:].unique())
     plt.title('Subtechnique Distribution - ' + participant + ' ' + intensity)
 
