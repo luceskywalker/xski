@@ -5,6 +5,8 @@ from matplotlib.lines import Line2D
 import glob
 from pathlib import Path
 from xski_utilites.signal import find_projection_index
+from matplotlib.ticker import FormatStrFormatter
+
 
 # path
 working_dir = Path().absolute().parent.parent/'files'
@@ -91,10 +93,18 @@ for i, trial in enumerate(files):
 
 
 
+    # for k in range(len(df)-1):
+    #     # plot segment in color corresponding to subtechnique from color dict
+    #     plt.plot(gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],1], gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],0], color = color_dict[df['sub-technique'].iloc[k+1]], lw=4)
+    #
+
+    fig, ax = plt.subplots()
+    fig.suptitle('Subtechnique Distribution - ' + participant + ' ' + intensity)
     for k in range(len(df)-1):
         # plot segment in color corresponding to subtechnique from color dict
-        plt.plot(gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],1], gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],0], color = color_dict[df['sub-technique'].iloc[k+1]], lw=4)
-
+        ax.plot(gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],1], gps.iloc[df['last frame'].iloc[k]:df['last frame'].iloc[k+1],0], color = color_dict[df['sub-technique'].iloc[k+1]], lw=4)
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
     # custum legend
     custom_lines = []
     for subtec in df['sub-technique'].iloc[1:].unique():
@@ -106,7 +116,7 @@ for i, trial in enumerate(files):
     plt.xlabel('Longitude')
     plt.ylabel('Latitude')
     plt.legend(custom_lines, df['sub-technique'].iloc[1:].unique())
-    plt.title('Subtechnique Distribution - ' + participant + ' ' + intensity)
+    # plt.title('Subtechnique Distribution - ' + participant + ' ' + intensity)
 
     # plot section points
     # for point in sec.index:

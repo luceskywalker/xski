@@ -1,5 +1,6 @@
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 import pandas as pd
 import numpy as np
 import os
@@ -85,6 +86,7 @@ for idx, section in zip(projection_idx.values(), colordict.keys()):
     ax.plot(distance[idx], runde['Height'].iloc[idx], 'ko', markersize=6)
     ax.fill_between(distance[i:idx], runde['Height'].iloc[i:idx], 0, color=colordict[section], alpha=.5, label = section)
     i = idx
+
 ax.fill_between(distance[idx:], runde['Height'].iloc[idx:], 0, color=colordict['flat 2'], alpha=.5, label = 'flat 2')
 ax.set_ylim(min(runde['Height'].iloc[1:])-1, max(runde['Height'].iloc[1:])+1)
 ax.set_xlim(0, max(distance))
@@ -109,6 +111,8 @@ set2=set2.T
 fig = plt.figure()
 fig.suptitle('Track Profile')
 ax = fig.add_subplot(111, projection='3d')
+ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 
 # this is new
 # segs = np.concatenate([set1[:-1],set1[1:]],axis=1)
