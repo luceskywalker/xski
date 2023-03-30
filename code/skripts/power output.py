@@ -4,8 +4,12 @@ get_ipython().magic("reset -sf")
 import numpy as np
 import os
 import pickle
+from scipy import signal
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-os.chdir("C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/file esportati")
+os.chdir("E:/movella challenge/file esportati")
 
 file = open("linear_velocity.pkl", "rb")
 lin_vel = pickle.load(file)
@@ -44,11 +48,15 @@ density = 1000 # kg/m3
 poles_r = 0.01 #m
 g = 9.81
 fs = 240
+fcut = 8
 
 partd = dict()
 intensd = dict()
 segmentd = dict()
 sided = dict()
+
+
+b,a= signal.butter(4, fcut /(fs/2), 'Lowpass') 
 
 
 counter = -1
@@ -91,13 +99,19 @@ for participant in lin_vel.keys():
                     omega_z = trial_ang_vel[side + " " + sensor_names[counter2] + " z"]
                     h = trial_lin_pos[side + " " + sensor_names[counter2] + " z"]
                     
+                    
+                    
+                    
+                    
                     kinetic_trans =0.5*segment_weight*(v_x**2 + v_y**2 + v_z**2)
                     kinetic_rot = 0.5*(Ix*omega_x**2 + Iy*omega_y**2 + Iz*omega_z**2)
                     pot = segment_weight*g*h
                     tot_energy_segment = kinetic_trans + kinetic_rot + pot
                     
-                    sided[side] = tot_energy_segment*fs/subjects_data["weight"][counter] # power normalized to bw [W/kg]
-                    del tot_energy_segment
+                    power = np.diff(tot_energy_segment)*fs/subjects_data["weight"][counter]# power normalized to bw [W/kg]
+                    power = signal.filtfilt(b,a,power)
+                    sided[side] = power 
+                    del power
                     
                 if sided:
                     segmentd[segment] = sided.copy()
@@ -117,9 +131,11 @@ for participant in lin_vel.keys():
                 kinetic_rot = 0.5*(Ix*omega_x**2 + Iy*omega_y**2 + Iz*omega_z**2)
                 pot = segment_weight*g*h
                 tot_energy_segment = kinetic_trans + kinetic_rot + pot
-                    
-                sided["Right"] = tot_energy_segment*fs/subjects_data["weight"][counter] # power normalized to bw [W/kg]
-                del tot_energy_segment
+                power = np.diff(tot_energy_segment)*fs/subjects_data["weight"][counter]# power normalized to bw [W/kg]
+                power = signal.filtfilt(b,a,power)
+                sided["Right"] = power
+                
+                del power
                 
                 if sided:
                     segmentd[segment] = sided.copy()
@@ -148,9 +164,11 @@ for participant in lin_vel.keys():
                         kinetic_rot = 0.5*(Ix*omega_x**2 + Iy*omega_y**2 + Iz*omega_z**2)
                         pot = poles_weight*g*h
                         tot_energy_segment = kinetic_trans + kinetic_rot + pot
+                        power = np.diff(tot_energy_segment)*fs/subjects_data["weight"][counter]# power normalized to bw [W/kg]
+                        power = signal.filtfilt(b,a,power)
                         
-                        sided[side] = tot_energy_segment*fs/poles_weight # power normalized to bw [W/kg]
-                        del tot_energy_segment
+                        sided[side] = power
+                        del power
                         
                     if sided:
                         segmentd[segment] = sided.copy()
@@ -187,8 +205,11 @@ for participant in lin_vel.keys():
                         pot = ski_weight*g*h
                         tot_energy_segment = kinetic_trans + kinetic_rot + pot
                         
-                        sided[side] = tot_energy_segment*fs/ski_weight # power normalized to bw [W/kg]
-                        del tot_energy_segment
+                        power = np.diff(tot_energy_segment)*fs/subjects_data["weight"][counter]# power normalized to bw [W/kg]
+                        
+                        power = signal.filtfilt(b,a,power)
+                        sided[side] = power
+                        del power
                         
                     if sided:
                         segmentd[segment] = sided.copy()
@@ -231,22 +252,124 @@ for participant in partd.keys():
                 for side in data_trial[segment].keys():
                     lower_sum = lower_sum + data_trial[segment][side]
            
-        total_power = lower_sum + upper_sum
-        ratio = upper_sum/lower_sum
-        intd[intensity] = {"total power": total_power, "power ratio": ratio, "upper body": upper_sum, "lower body": lower_sum}
+        intd[intensity] = {"upper body": upper_sum, "lower body": lower_sum}
         lower_sum = 0
         upper_sum = 0
-        del total_power, ratio
+        
     
     if intd:
         subjectd[participant] = intd.copy()
     intd.clear
           
-
+########################################### di df and pics #################################################################    
+file = open("C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/xski/files/ski_cycles.pkl", "rb")
+ski_cycles = pickle.load(file)
+file.close() 
             
         
-        
-        
+df = pd.DataFrame(columns=['subject', 'intensity', 'technique', "quantity", "cycle", "parcentile", "power"])
+
+from scipy import signal
+partlist = []    
+intlist = []
+techlist = []
+perclist = []
+powlist =[]  
+cyclelist =[]
+quantlist = []
+
+plant = 0
+for participant in ski_cycles.keys():
+    for intensity in ["easy", "medium", "hard"]:
+        for technique in ski_cycles[participant][intensity].keys():
+            for interval in ski_cycles[participant][intensity][technique]:
+                
+                cycles = ski_cycles[participant][intensity][technique][interval]
+                
+                for i in range(0, len(cycles)-1):
+                    start = cycles[i]
+                    end = cycles[i+1]
+                    plant +=1
+                    
+                    for quantity in ["lower body", "upper body"]:
+                        
+                        power_cycle = subjectd[participant][intensity][quantity][start:end]
+                        power_cycle = signal.resample_poly(power_cycle, 100, len(power_cycle), padtype="line")
+                        
+                        partlist = partlist + [participant]*100 
+                        intlist = intlist + [intensity]*100 
+                        techlist = techlist + [technique]*100
+                        quantlist = quantlist + [quantity]*100
+                        cyclelist = cyclelist + [plant]*100
+                        perclist = perclist + list(np.arange(1,101))
+                        powlist = powlist + list(power_cycle)
+                        
+    
+df = pd.DataFrame()
+df["subject"] = partlist
+df["intensity"] = intlist
+df["technique"] = techlist
+df["cycle"] = cyclelist
+df["percentile"] = perclist                
+df["power"] = powlist               
+df["quantity"] = quantlist  
+
+
+quant= "upper body"
+
+dfq = df[df["quantity"] == quant].reset_index(drop =True)   
+dfq = dfq.groupby(["subject", "intensity", "technique", "percentile"], as_index = False)["power"].mean() 
+dfq_dp =dfq[dfq["technique"] == "dp"]
+  
+intens = "hard"
+dfq_dp =dfq_dp[dfq_dp["intensity"] == intens]
+
+partord = ["P3", "P5", "P6", "P7", "P8", "P12", "P13", "P14"]
+
+plt.figure()
+ax = sns.lineplot(x = "percentile", y = "power", hue = "subject", data = dfq_dp, hue_order = partord, linewidth = 3)
+plt.setp(ax.get_legend().get_texts(), fontsize='15') # for legend text
+leg = plt.legend(ncol=8, loc="upper left", fontsize = 18.5, bbox_to_anchor=(0, 1))
+plt.title("Power output in " + quant)
+plt.xlabel("Ski cycle [%]", fontsize = 35)
+plt.ylabel("Power [W/kg]", fontsize = 35)
+for line in leg.get_lines():
+    line.set_linewidth(3.0)
+    
+
+dfu = df[df["quantity"] == "upper body"].reset_index(drop =True)   
+dfl = df[df["quantity"] == "lower body"].reset_index(drop =True)   
+
+dfu = dfu.groupby(["subject", "intensity", "technique", "percentile"], as_index = False)["power"].mean() 
+dfl = dfl.groupby(["subject", "intensity", "technique", "percentile"], as_index = False)["power"].mean() 
+
+dfu["ratio"] = abs(dfu["power"]) / (abs(dfu["power"]) + abs(dfl["power"]))*100
+dfu_dp =dfu[(dfu["technique"] == "dp") & (dfu["intensity"] == "hard")]
+ 
+
+
+
+
+
+plt.figure()
+ax = sns.lineplot(x = "percentile", y = "ratio", hue = "subject", data = dfu_dp, hue_order = partord, linewidth = 3)
+plt.setp(ax.get_legend().get_texts(), fontsize='15') # for legend text
+leg = plt.legend(ncol=8, loc="upper left", fontsize = 18.5, bbox_to_anchor=(0, 0.1))
+plt.title("Upper body contribution as percentage of full body power", fontsize = 40)
+plt.xlabel("Ski cycle [%]", fontsize = 35)
+plt.ylabel("Percentage [%]", fontsize = 35)
+plt.xticks(fontsize = 25)
+plt.yticks(fontsize = 25)
+for line in leg.get_lines():
+    line.set_linewidth(3.0)
+
+
+
+
+
+
+
+
 
 
 

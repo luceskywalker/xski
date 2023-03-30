@@ -8,9 +8,10 @@ import pandas as pd
 import seaborn as sns
 import os 
 os.chdir('C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/xski/code/skripts')
+"""
 from vector_coding import vec_cod
 
-"""
+
 file = open("C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/xski/files/ski_cycles.pkl",'rb')
 ski_cycles = pickle.load(file)
 file.close()
@@ -53,6 +54,7 @@ for participant in ski_cycles.keys():
         particd[participant] = intensd.copy()
     intensd.clear()
 
+coord_dict= particd
 f = open("C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/xski/files/coordination_states.pkl","wb")
 pickle.dump(particd,f)
 f.close()
@@ -112,10 +114,26 @@ df= df.groupby(["subject", "intensity", "technique", "coupling", "phase", "cycle
 #dfstd = df.groupby(["subject", "intensity", "technique", "coupling", "phase"], as_index=False)["phase_freq"].std()
 
 
-dfmean_coup = df[(df["coupling"] == "kh") & 
-                     (df["intensity"] == "medium") &
+dfmean_coup = df[(df["coupling"] == "hs") & 
+                     (df["intensity"] == "hard") &
                      (df["technique"] == "dp")]
 
 
-sns.barplot(data = dfmean_coup, x = "subject", y = "phase_freq", hue = "phase")
+dfmean_coup["phase"] = dfmean_coup["phase"].replace({'ecc': 'Eccentric', 
+                                                                'conc': 'Concentric',
+                                                                'prox_conc': 'Proximal conc',
+                                                                'prox_ecc': 'Proximal ecc'})
+
+plt.figure()
+ax = sns.barplot(data = dfmean_coup, x = "phase", y = "phase_freq", hue = "subject")
+plt.setp(ax.get_legend().get_texts(), fontsize='15') # for legend text
+leg = plt.legend(ncol=8, loc="upper left", fontsize = 18.5, bbox_to_anchor=(0, 1))
+plt.title("Hip-shoulder coordination frequency in double poling", fontsize = 40)
+plt.xlabel("Ski cycle [%]", fontsize = 35)
+plt.ylabel("Frequency [% ski cycle]", fontsize = 35)
+plt.xticks(fontsize = 20)
+plt.yticks(fontsize = 20)
+#ax.set_ylim([0, 16])
+for line in leg.get_lines():
+    line.set_linewidth(3.0)
 

@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import os 
 
-os.chdir(r'C:\Users\b1090197\Documents\Case Study Kit\Recordings\GPS RTK data')
+os.chdir(r'C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/xsens_case-study-kit_2023-03-07_1502/Case Study Kit/Recordings/GPS RTK data')
 plt.close('all')
 
 subject = 13
@@ -66,10 +66,6 @@ x = df.iloc[:,-2].to_numpy()
 y = df.iloc[:,-1].to_numpy()
 z = ((df["Height"]- df["Height"][0])/1000).to_numpy()
 
-######################################### 3d  lat long ###########################
-x = (df["Longitude"]/10000000).to_numpy()
-y = (df["Latitude"]/10000000).to_numpy()
-z = ((df["Height"]- df["Height"][0])/1000).to_numpy()
 
 znew = np.array([])
 
@@ -85,14 +81,18 @@ znew = np.append(znew, np.mean(z[i-2:i+2]))
 znew = np.append(znew, np.mean(z[i-2:i+1]))   
 z = znew
 
-############################################ sections ##################################################
-plt.figure()
-plt.plot(x, z)
+"""
+df = pd.DataFrame({"x": x, "y": y,"z": z, "mu": mu_mixed})
 
-plt.figure()
-plt.plot(y, z)
+#threshold_high = np.percentile(df["mu"].to_numpy(), 100)
+#threshold_low = np.percentile(df["mu"].to_numpy(), 2.5)
+#df = df[(df["mu"]< threshold_high)]
 
-
+x=df["x"].to_numpy()
+y=df["y"].to_numpy()
+z=df["z"].to_numpy()
+mu_mixed =df["mu"].to_numpy()
+"""
 ###################### altern vel ########################################################
 plt.close("all")  
 points = np.array([x,y,z]).transpose().reshape(-1,1,3)
@@ -111,9 +111,9 @@ ax.set_ylim(y.min(), y.max())
 ax.set_zlim(z.min(), z.max())
 
 plt.show()
-  
-fig.gca().set_xlabel("Longitude", fontsize = 17, labelpad=7)
-fig.gca().set_ylabel("Latitude", fontsize = 17, labelpad=7)
+#fig.gca().set_title("Snow friction along skied trajectory, P13", fontsize = 30)  
+fig.gca().set_xlabel("X Displacement", fontsize = 17, labelpad=7)
+fig.gca().set_ylabel("Y displacement", fontsize = 17, labelpad=7)
 fig.gca().set_zlabel("Elevation gain [m]", fontsize = 17)
        
   

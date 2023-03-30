@@ -10,7 +10,7 @@ from scipy import signal
 from scipy.signal import find_peaks
   
 
-os.chdir('C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/file esportati/CoM')
+os.chdir('C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/xski/files')
 plt.close("all")
 subjects= np.array([3, 5, 6, 7, 8, 12, 13, 14])
 intensities = ["easy", "medium", "hard"]
@@ -20,14 +20,14 @@ dist_part = (np.array([0.8, 0.7, 0.6, 0.6, 0.7, 0.6, 0.7, 0.7])*fs).astype(int)
 sub_techniques = ["dp", "dp-skate", "dp-kick", "diagonal", "heringbone"]
 
 ##################################### loading from excel ##################################
-
+"""
 intens = dict()
 part = dict()
 for subj in subjects:
     for intensity in intensities:
         
         name = "P" + str(subj) + "_" + intensity + "_round.xlsx"
-        df = pd.read_excel(name, sheet_name = "Center of Mass", usecols ="B:D")
+        df = pd.read_excel(name, sheet_name = "Center of Mass", usecols ="B:J")
         data_round = dict(zip(df.T.index, df.T.values))
       
         if data_round:
@@ -39,10 +39,10 @@ for subj in subjects:
     intens.clear()                    
 
       
-f = open("C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/file esportati/com_position.pkl","wb")
+f = open("C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/file esportati/com_data.pkl","wb")
 pickle.dump(part,f)
 f.close()
-
+"""
 #######################################################################################################
 ###### load dictionary
 file = open("C:/Users/Matteo/Downloads/salzburg/projects/movella challenge/file esportati/raw_acc_poles.pkl",'rb')
@@ -122,11 +122,17 @@ for participant in subjects:
                     
                     
                     
-                    plt.plot(np.arange(start,end), resultant_left[start: end], label = technique)
-                    plt.plot(np.arange(start,end), shoulder_left[start: end], c = "black")
-                    plt.plot(acc_peaks_left, resultant_left[acc_peaks_left], "v", color="red")
+                    plt.plot(np.arange(start,end), resultant_left[start: end], label = technique, linewidth = 3)
+                    plt.plot(np.arange(start,end), shoulder_left[start: end], c = "black", 
+                             label = "shoulder angle", linewidth = 3)
+                    plt.plot(acc_peaks_left, resultant_left[acc_peaks_left], "v", color="red", 
+                             label = "pole plant",  markersize=13)
+                    plt.title("Ski cycle event detections", fontsize = 35)
+                    plt.xlabel("Frame #", fontsize = 25)
+                    plt.xticks(fontsize = 20)
+                    plt.yticks(fontsize = 20)
                     del start, end
-                #plt.legend()
+                    plt.legend(fontsize = 25)
                     
                     if len(acc_peaks_left) != 0:            
                        intervd[interval]= acc_peaks_left 
